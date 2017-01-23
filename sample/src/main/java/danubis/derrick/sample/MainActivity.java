@@ -1,11 +1,15 @@
 package danubis.derrick.sample;
 
 import android.graphics.Color;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -17,29 +21,21 @@ import danubis.derrick.coverflow.core.PagerContainer;
 
 public class MainActivity extends AppCompatActivity {
 
+    PagerContainer mContainer;
+    ViewPager pager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        PagerContainer mContainer = (PagerContainer) findViewById(R.id.pager_container);
-
-        final ViewPager pager = mContainer.getViewPager();
+        mContainer = (PagerContainer) findViewById(R.id.pager_container);
+        pager = mContainer.getViewPager();
 
         PagerAdapter adapter = new MyPagerAdapter();
         pager.setAdapter(adapter);
-
         pager.setOffscreenPageLimit(adapter.getCount());
-
         pager.setClipChildren(false);
-
-        mContainer.setPageItemClickListener(new PageItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Toast.makeText(MainActivity.this, "position: " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
-
 
         new CoverFlow.Builder()
                 .with(pager)
@@ -53,11 +49,18 @@ public class MainActivity extends AppCompatActivity {
     private class MyPagerAdapter extends PagerAdapter {
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(ViewGroup container, final int position) {
             TextView view = new TextView(MainActivity.this);
             view.setText("Item " + position);
             view.setGravity(Gravity.CENTER);
             view.setBackgroundColor(Color.argb(255, position * 50, position * 10, position * 50));
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("test", "position: " + position);
+                }
+            });
 
             container.addView(view);
             return view;

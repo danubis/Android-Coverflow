@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -92,8 +94,8 @@ public class PagerContainer extends FrameLayout implements ViewPager.OnPageChang
 //                ev.offsetLocation(mCenter.x - mInitialTouch.x, mCenter.y - mInitialTouch.y);
 //                break;
 //            case MotionEvent.ACTION_UP:
-//                int delta = Utils.isInNonTappableRegion(getWidth(),mPager.getWidth(),mInitialTouch.x, ev.getX());
-//                if(delta!=0){
+//                int delta = Utils.isInNonTappableRegion(getWidth(), mPager.getWidth(), mInitialTouch.x, ev.getX());
+//                if (delta != 0) {
 //                    int preItem = mPager.getCurrentItem();
 //                    int currentItem = preItem + delta;
 //                    mPager.setCurrentItem(currentItem);
@@ -108,8 +110,43 @@ public class PagerContainer extends FrameLayout implements ViewPager.OnPageChang
 //        return mPager.dispatchTouchEvent(ev);
 //    }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mInitialTouch.x = (int) ev.getX();
+                break;
 
+            case MotionEvent.ACTION_UP:
+                float movedDistance = ev.getX() - mInitialTouch.x;
+                if (Math.abs(movedDistance) >= mPager.getWidth()) {
 
+                    int preItem = mPager.getCurrentItem();
+                    int delta = (int) (movedDistance / mPager.getWidth());
+                    int currentItem = preItem + delta;
+                    mPager.setCurrentItem(currentItem);
+
+                }
+//                else if (Math.abs(movedDistance) <= 20 && touchOnCurrent(mInitialTouch.x)) {
+//                    if (pageItemClickListener != null) {
+//                        pageItemClickListener.onItemClick(mPager.getChildAt(
+//                                mPager.getCurrentItem()), mPager.getCurrentItem());
+//                    }
+//                }
+
+                break;
+        }
+
+        return mPager.dispatchTouchEvent(ev);
+    }
+
+    private boolean touchOnCurrent(float x) {
+
+        float leftEdge = (getWidth() - mPager.getWidth()) / 2;
+        float rightEdge = (getWidth() + mPager.getWidth()) / 2;
+
+        return x >= leftEdge && x <= rightEdge;
+    }
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -160,5 +197,4 @@ public class PagerContainer extends FrameLayout implements ViewPager.OnPageChang
     public void onPageScrollStateChanged(int state) {
         mNeedsRedraw = (state != ViewPager.SCROLL_STATE_IDLE);
     }
-
 }

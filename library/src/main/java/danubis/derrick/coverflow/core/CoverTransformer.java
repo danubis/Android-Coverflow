@@ -41,7 +41,7 @@ public class CoverTransformer implements ViewPager.PageTransformer {
         }
 
         if (scale != 0f) {
-            float realScale = Utils.getFloat(1 - Math.abs(position * scale),SCALE_MIN,SCALE_MAX);
+            float realScale = getFloat(1 - Math.abs(position * scale),SCALE_MIN,SCALE_MAX);
             page.setScaleX(realScale);
             page.setScaleY(realScale);
         }
@@ -51,12 +51,15 @@ public class CoverTransformer implements ViewPager.PageTransformer {
             float realPagerMargin = position * (pagerMargin);
 
             if (spaceValue != 0) {
-                float realSpaceValue = Utils.getFloat(Math.abs(position * spaceValue),MARGIN_MIN,MARGIN_MAX);
+                float realSpaceValue = getFloat(Math.abs(position * spaceValue),MARGIN_MIN,MARGIN_MAX);
                 realPagerMargin += (position > 0) ? realSpaceValue : - realSpaceValue;
             }
 
             page.setTranslationX(realPagerMargin);
         }
+    }
 
+    private float getFloat(float value, float minValue, float maxValue) {
+        return Math.min(maxValue, Math.max(minValue, value));
     }
 }
